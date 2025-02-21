@@ -1,6 +1,6 @@
 import express from "express";
 import {
-  checkAuth,  
+  checkAuth,
   login,
   logout,
   signup,

@@ -2,7 +2,8 @@
 
 A modern real-time chat application built with React, Node.js, and Socket.IO, featuring a clean UI with DaisyUI and Tailwind CSS.
 
-![image](https://github.com/user-attachments/assets/d870784d-9509-4dd7-8447-9a460f82fcfb)
+![image](https://github.com/user-attachments/assets/1f8f3aa5-aa68-4ca5-8a4d-c50032faeb4a)
+
 
 
 

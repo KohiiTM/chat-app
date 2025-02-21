@@ -46,9 +46,7 @@ const ProfilePage = () => {
                   bg-base-content hover:scale-105
                   p-2 rounded-full cursor-pointer 
                   transition-all duration-200
-                  ${
-                    isUpdatingProfile ? "animate-pulse pointer-events-none" : ""
-                  }
+                  ${isUpdatingProfile ? "animate-pulse pointer-events-none" : ""}
                 `}
               >
                 <Camera className="w-5 h-5 text-base-200" />
@@ -63,9 +61,7 @@ const ProfilePage = () => {
               </label>
             </div>
             <p className="text-sm text-zinc-400">
-              {isUpdatingProfile
-                ? "Uploading..."
-                : "Click the camera icon to update your photo"}
+              {isUpdatingProfile ? "Uploading..." : "Click the camera icon to update your photo"}
             </p>
           </div>
 
@@ -75,9 +71,7 @@ const ProfilePage = () => {
                 <User className="w-4 h-4" />
                 Full Name
               </div>
-              <p className="px-4 py-2.5 bg-base-200 rounded-lg border">
-                {authUser?.fullName}
-              </p>
+              <p className="px-4 py-2.5 bg-base-200 rounded-lg border">{authUser?.fullName}</p>
             </div>
 
             <div className="space-y-1.5">
@@ -85,9 +79,7 @@ const ProfilePage = () => {
                 <Mail className="w-4 h-4" />
                 Email Address
               </div>
-              <p className="px-4 py-2.5 bg-base-200 rounded-lg border">
-                {authUser?.email}
-              </p>
+              <p className="px-4 py-2.5 bg-base-200 rounded-lg border">{authUser?.email}</p>
             </div>
           </div>
 

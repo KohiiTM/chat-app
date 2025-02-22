@@ -2,7 +2,11 @@
 
 A modern real-time chat application built with React, Node.js, and Socket.IO, featuring a clean UI with DaisyUI and Tailwind CSS.
 
-![Demo App](/frontend/public/screenshot-for-readme.png)
+![image](https://github.com/user-attachments/assets/1f8f3aa5-aa68-4ca5-8a4d-c50032faeb4a)
+
+
+
+
 
 ## Features
 
@@ -97,12 +101,7 @@ npm run build
 npm start
 ```
 
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## Contact
+This project is licensed under the MIT License 

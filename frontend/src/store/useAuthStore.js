@@ -3,7 +3,8 @@ import { axiosInstance } from "../lib/axios.js";
 import toast from "react-hot-toast";
 import { io } from "socket.io-client";
 
-const BASE_URL = import.meta.env.MODE === "development" ? "http://localhost:5001" : "/";
+const BASE_URL =
+  import.meta.env.MODE === "development" ? "http://localhost:5001" : "/";
 
 export const useAuthStore = create((set, get) => ({
   authUser: null,
@@ -101,5 +102,20 @@ export const useAuthStore = create((set, get) => ({
   },
   disconnectSocket: () => {
     if (get().socket?.connected) get().socket.disconnect();
+  },
+
+  deleteAccount: async () => {
+    try {
+      const res = await axiosInstance.delete("/auth/delete-account");
+      set({ authUser: null });
+      get().disconnectSocket();
+      toast.success("Account deleted successfully");
+      // Force a page reload to ensure clean state
+      window.location.href = "/login";
+    } catch (error) {
+      console.error("Delete account error:", error);
+      toast.error(error.response?.data?.message || "Error deleting account");
+      throw error; // Propagate error to component
+    }
   },
 }));

@@ -2,6 +2,7 @@ import { generateToken } from "../lib/utils.js";
 import User from "../models/user.model.js";
 import bcrypt from "bcryptjs";
 import cloudinary from "../lib/cloudinary.js";
+import Message from "../models/message.model.js";
 
 export const signup = async (req, res) => {
   const { fullName, email, password } = req.body;
@@ -11,7 +12,9 @@ export const signup = async (req, res) => {
     }
 
     if (password.length < 6) {
-      return res.status(400).json({ message: "Password must be at least 6 characters" });
+      return res
+        .status(400)
+        .json({ message: "Password must be at least 6 characters" });
     }
 
     const user = await User.findOne({ email });
@@ -114,5 +117,37 @@ export const checkAuth = (req, res) => {
   } catch (error) {
     console.log("Error in checkAuth controller", error.message);
     res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+export const deleteAccount = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    console.log("Deleting account for user:", userId);
+
+    // Delete user's messages
+    const deletedMessages = await Message.deleteMany({
+      $or: [{ senderId: userId }, { receiverId: userId }],
+    });
+    console.log("Deleted messages:", deletedMessages);
+
+    // Delete user's profile picture from Cloudinary if exists
+    if (req.user.profilePic) {
+      const publicId = req.user.profilePic.split("/").pop().split(".")[0];
+      await cloudinary.uploader.destroy(publicId);
+      console.log("Deleted profile picture from Cloudinary");
+    }
+
+    // Delete the user
+    const deletedUser = await User.findByIdAndDelete(userId);
+    console.log("Deleted user:", deletedUser);
+
+    // Clear the JWT cookie
+    res.cookie("jwt", "", { maxAge: 0 });
+
+    res.status(200).json({ message: "Account deleted successfully" });
+  } catch (error) {
+    console.log("Error in deleteAccount controller:", error.message);
+    res.status(500).json({ message: error.message });
   }
 };

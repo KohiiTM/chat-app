@@ -1,6 +1,6 @@
-# Full Stack Realtime Chat Application
+# Nook - Full Stack Realtime Chat Application
 
-A modern real-time chat application built with React, Node.js, and Socket.IO, featuring a clean UI with DaisyUI and Tailwind CSS.
+A modern real-time chat application built with React, Node.js, and Socket.IO.
 
 ![image](https://github.com/user-attachments/assets/1f8f3aa5-aa68-4ca5-8a4d-c50032faeb4a)
 
@@ -18,6 +18,9 @@ A modern real-time chat application built with React, Node.js, and Socket.IO, fe
 - Responsive design
 - Image enlargement view
 - Online users filter
+- Delete account
+- Delete messages
+- Image compression for large files
 
 ## Tech Stack
 

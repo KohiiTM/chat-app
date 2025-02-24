@@ -5,7 +5,8 @@ import MessageInput from "./MessageInput";
 import MessageSkeleton from "./skeletons/MessageSkeleton";
 import { useAuthStore } from "../store/useAuthStore";
 import { formatMessageTime } from "../lib/utils";
-import { X } from "lucide-react"; // Import X icon for close button
+import { X, Trash2 } from "lucide-react"; // Import X icon for close button
+import toast from "react-hot-toast";
 
 const ChatContainer = () => {
   // Add state for enlarged image
@@ -17,6 +18,7 @@ const ChatContainer = () => {
     selectedUser,
     subscribeToMessages,
     unsubscribeFromMessages,
+    deleteMessage,
   } = useChatStore();
   const { authUser } = useAuthStore();
   const messageEndRef = useRef(null);
@@ -39,6 +41,11 @@ const ChatContainer = () => {
       messageEndRef.current.scrollIntoView({ behavior: "smooth" });
     }
   }, [messages]);
+
+  const handleDeleteMessage = async (messageId) => {
+    if (!confirm("Are you sure you want to delete this message?")) return;
+    await deleteMessage(messageId);
+  };
 
   if (isMessagesLoading) {
     return (
@@ -81,7 +88,7 @@ const ChatContainer = () => {
                 </time>
               </div>
               <div
-                className={`flex flex-col ${
+                className={`flex flex-col group relative ${
                   message.text
                     ? `chat-bubble ${
                         isSent
@@ -100,6 +107,18 @@ const ChatContainer = () => {
                   />
                 )}
                 {message.text && <p>{message.text}</p>}
+
+                {/* Delete button - only show for sent messages */}
+                {isSent && (
+                  <button
+                    onClick={() => handleDeleteMessage(message._id)}
+                    className="absolute -top-2 -right-2 size-6 rounded-full bg-base-300 
+                    opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center
+                    hover:bg-error hover:text-error-content"
+                  >
+                    <Trash2 className="size-3" />
+                  </button>
+                )}
               </div>
             </div>
           );

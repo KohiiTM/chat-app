@@ -6,8 +6,14 @@ import { Settings, Users } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const Sidebar = () => {
-  const { getUsers, users, selectedUser, setSelectedUser, isUsersLoading } =
-    useChatStore();
+  const {
+    getUsers,
+    users,
+    selectedUser,
+    setSelectedUser,
+    isUsersLoading,
+    unreadCounts,
+  } = useChatStore();
   const { authUser, onlineUsers } = useAuthStore();
   const [showOnlineOnly, setShowOnlineOnly] = useState(false);
 
@@ -79,6 +85,13 @@ const Sidebar = () => {
                 {onlineUsers.includes(user._id) ? "Online" : "Offline"}
               </div>
             </div>
+
+            {/* Unread message indicator */}
+            {unreadCounts[user._id] > 0 && (
+              <div className="size-5 rounded-full bg-primary text-primary-content text-xs flex items-center justify-center">
+                {unreadCounts[user._id]}
+              </div>
+            )}
           </button>
         ))}
 

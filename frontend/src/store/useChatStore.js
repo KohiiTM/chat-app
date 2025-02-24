@@ -9,6 +9,7 @@ export const useChatStore = create((set, get) => ({
   selectedUser: null,
   isUsersLoading: false,
   isMessagesLoading: false,
+  unreadCounts: {},
 
   getUsers: async () => {
     set({ isUsersLoading: true });
@@ -36,33 +37,80 @@ export const useChatStore = create((set, get) => ({
   sendMessage: async (messageData) => {
     const { selectedUser, messages } = get();
     try {
-      const res = await axiosInstance.post(`/messages/send/${selectedUser._id}`, messageData);
+      const res = await axiosInstance.post(
+        `/messages/send/${selectedUser._id}`,
+        messageData
+      );
       set({ messages: [...messages, res.data] });
     } catch (error) {
       toast.error(error.response.data.message);
     }
   },
 
+  deleteMessage: async (messageId) => {
+    try {
+      await axiosInstance.delete(`/messages/${messageId}`);
+      set((state) => ({
+        messages: state.messages.filter((message) => message._id !== messageId),
+      }));
+      toast.success("Message deleted");
+    } catch (error) {
+      toast.error(error.response?.data?.error || "Failed to delete message");
+    }
+  },
+
+  markMessagesAsRead: async (userId) => {
+    try {
+      await axiosInstance.post(`/messages/read/${userId}`);
+      set((state) => ({
+        unreadCounts: {
+          ...state.unreadCounts,
+          [userId]: 0,
+        },
+      }));
+    } catch (error) {
+      console.error("Error marking messages as read:", error);
+    }
+  },
+
   subscribeToMessages: () => {
     const { selectedUser } = get();
-    if (!selectedUser) return;
-
     const socket = useAuthStore.getState().socket;
 
     socket.on("newMessage", (newMessage) => {
-      const isMessageSentFromSelectedUser = newMessage.senderId === selectedUser._id;
-      if (!isMessageSentFromSelectedUser) return;
+      if (selectedUser?._id === newMessage.senderId) {
+        set((state) => ({
+          messages: [...state.messages, newMessage],
+        }));
+        get().markMessagesAsRead(newMessage.senderId);
+      } else {
+        set((state) => ({
+          unreadCounts: {
+            ...state.unreadCounts,
+            [newMessage.senderId]:
+              (state.unreadCounts[newMessage.senderId] || 0) + 1,
+          },
+        }));
+      }
+    });
 
-      set({
-        messages: [...get().messages, newMessage],
-      });
+    socket.on("messageDeleted", (messageId) => {
+      set((state) => ({
+        messages: state.messages.filter((message) => message._id !== messageId),
+      }));
     });
   },
 
   unsubscribeFromMessages: () => {
     const socket = useAuthStore.getState().socket;
     socket.off("newMessage");
+    socket.off("messageDeleted");
   },
 
-  setSelectedUser: (selectedUser) => set({ selectedUser }),
+  setSelectedUser: (user) => {
+    set({ selectedUser: user });
+    if (user) {
+      get().markMessagesAsRead(user._id);
+    }
+  },
 }));

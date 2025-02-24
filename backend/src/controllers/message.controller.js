@@ -7,11 +7,41 @@ import { getReceiverSocketId, io } from "../lib/socket.js";
 export const getUsersForSidebar = async (req, res) => {
   try {
     const loggedInUserId = req.user._id;
+
+    // Get all users except the logged-in user
     const filteredUsers = await User.find({
       _id: { $ne: loggedInUserId },
     }).select("-password");
 
-    res.status(200).json(filteredUsers);
+    // Get unread message counts for each user
+    const unreadCounts = await Message.aggregate([
+      {
+        $match: {
+          receiverId: loggedInUserId,
+          read: false,
+        },
+      },
+      {
+        $group: {
+          _id: "$senderId",
+          count: { $sum: 1 },
+        },
+      },
+    ]);
+
+    // Convert to object for easier lookup
+    const unreadCountMap = {};
+    unreadCounts.forEach((item) => {
+      unreadCountMap[item._id.toString()] = item.count;
+    });
+
+    // Add unread counts to user objects
+    const usersWithCounts = filteredUsers.map((user) => ({
+      ...user.toObject(),
+      unreadCount: unreadCountMap[user._id.toString()] || 0,
+    }));
+
+    res.status(200).json(usersWithCounts);
   } catch (error) {
     console.error("Error in getUsersForSidebar: ", error.message);
     res.status(500).json({ error: "Internal server error" });
